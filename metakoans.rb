@@ -61,14 +61,14 @@ module MetaKoans
   def koan_2
     c = Class::new {
       class << self
-        attribute 'a'
+        attribute 't'
       end
     }
  
-    assert{ not c.a? }
-    assert{ c.a = 42 }
-    assert{ c.a == 42 }
-    assert{ c.a? }
+    assert{ not c.t? }
+    assert{ c.t = 42 }
+    assert{ c.t == 42 }
+    assert{ c.t? }
   end
 #
 # 'attribute' must provide getter, setter, and query to modules at module
@@ -77,14 +77,14 @@ module MetaKoans
   def koan_3
     m = Module::new {
       class << self
-        attribute 'a'
+        attribute 'd'
       end
     }
  
-    assert{ not m.a? }
-    assert{ m.a = 42 }
-    assert{ m.a == 42 }
-    assert{ m.a? }
+    assert{ not m.d? }
+    assert{ m.d = 42 }
+    assert{ m.d == 42 }
+    assert{ m.d? }
   end
 #
 # 'attribute' must provide getter, setter, and query to modules which operate
@@ -168,8 +168,8 @@ module MetaKoans
   def koan_8
     b = Class::new {
       class << self
-        attribute 'a' => 42
-        attribute('b'){ a }
+        attribute 'x' => 42
+        attribute('y'){ x }
       end
       attribute 'a' => 42
       attribute('b'){ a }
@@ -177,17 +177,18 @@ module MetaKoans
  
     c = Class::new b
  
-    assert{ c.a == 42 }
-    assert{ c.a? }
-    assert{ (c.a = nil) == nil }
-    assert{ not c.a? }
- 
+    assert{ c.x == 42 }
+    assert{ c.x? }
+    assert{ (c.x = nil) == nil }
+    assert{ not c.x? }
+
     o = c::new
  
     assert{ o.a == 42 }
     assert{ o.a? }
     assert{ (o.a = nil) == nil }
     assert{ not o.a? }
+ 
   end
 #
 # into the void

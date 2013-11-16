@@ -1,44 +1,39 @@
-module ::Kernel
-  @@default_values = {}
+require 'pry'
 
-  def initialize
-    @@default_values.each_pair do |attr_name, value|
-      variable = :"@#{attr_name}"
-      instance_variable_set variable, value
-    end
-  end
+class ::Module
 
   def attribute(config, &block)
     if config.is_a? Hash
       attr_name = config.keys.first
-      @@default_values[attr_name] = config.values.first
-    elsif config.is_a? String
-      attr_name = config
+      attr_default_value = config.values.first
+    else
+      attr_name = config.to_s
+      attr_default_value = block if block_given?
     end
 
-    variable = :"@#{attr_name}"
-    getter = attr_name.to_sym
-    setter = "#{attr_name}=".to_sym
-    checker = "#{attr_name}?".to_sym
-    uses_block = block_given?
+    instance_var = :"@#{attr_name}"
+    getter = :"#{attr_name}"
+    setter = :"#{attr_name}="
+    checker = :"#{attr_name}?"
 
     define_method getter do
-      if uses_block
-        self.instance_eval(&block)
+      if instance_variable_defined?(instance_var)
+        instance_variable_get instance_var
       else
-        instance_variable_get variable
+        if (attr_default_value.is_a? Proc)
+          instance_eval(&attr_default_value)
+        elsif attr_default_value
+          attr_default_value
+        end
       end
     end
 
     define_method setter do |value|
-      instance_variable_set variable, value
-      uses_block = false
+      instance_variable_set instance_var, value
     end
 
     define_method checker do
-      return true if uses_block
-      instance_variable_defined? variable and
-      instance_variable_get variable
+      !!send(getter) 
     end
   end
 end
